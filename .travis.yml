@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for jalving/CMakeBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: Muo0gwbeEI0g+97xkJUWOg5RzOAzXHvM7gLUAXHVUGJeiguopcv0s6B0HH8pfpbSgKAx3MpceKmRsmySj5lZTgwJbC8IbRknYwa77cuOtexyc3aSPCckx4M9KQm4bI9URfoaYD+AZOgBa3WztYEOZeK8anzdJUu/Td7DKTRfLDCeo84oLDAgmYfQGJAFQF6/o1aoWxArYo/Tdopa6k9dTfKk4XT8FKCioIUGtCouf4N8M3gONBkNtcglKuRU/lnOOqdgbfsgN5bYH+5PtorjNHMOxHY5wInXmqGmWimJ+9OIrDuRbEuvqZ58qUeWgttB5bGwF8EjpYg02l+zVtJU0IKZGvcmd9csLPAosHCbNqkM6zQnZyUxY11XGTXlXVfn4YXIYMsAoyhVg+KFcJdqpjajFPdqzw51BY7Xswn8oxJGrb1hRrYxoVGZ57iLZC8ejlyht8Yx167UC+zH036rHm3OQb5qqXBz9F5zX7HE9Ex8BbFDRyMIkdkpwGMlqcvEvYGYOPqKq/rtGnQ/ZmqZGi/mpQ+NwRb5CwR1TDBeGetJw2oi9eYh6PAhrSc8ZboxLsjAHzfdG8QW1Qrhia16RbWscV+ZrvEbmQxYqY9hxY3J5wquK67b/4kQ75ssLG8b+6xvvdwPfAJa9DXXm7TWYRrWfbjg8+hK4cLUChHgyqw=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: jalving/CMakeBuilder
+        tags: true
